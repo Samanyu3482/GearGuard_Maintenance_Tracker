@@ -1,46 +1,27 @@
-
-
-
 require("dotenv").config();
-
-const db = require("./config/db");
 const express = require("express");
-const authRoutes = require("./routes/auth_route");
-
 const cors = require("cors");
 
-
-const app=express();
-
-
-
-
-
-
-
-app.use(cors());
-app.use(express.json());         
-app.use(express.urlencoded({ extended: true }));
-app.use("/api/auth", authRoutes);
-
-
-
-app.get("/db-test", (req, res) => {
-  db.query("SHOW TABLES", (err, results) => {
-    if (err) return res.status(500).json(err);
-    res.json(results);
-  });
-});
+const authRoutes = require("./routes/auth_route");
+const equipmentRoutes = require("./routes/equipment_routes");
+const requestRoutes = require("./routes/request_routes");
 
 const { verifyToken } = require("./middleware/auth_middleware");
 
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use("/api/auth", authRoutes);
+app.use("/api/equipment", equipmentRoutes);
+app.use("/api/requests", requestRoutes);
+
 app.get("/protected", verifyToken, (req, res) => {
-  res.json({
-    message: "Protected route accessed successfully ✅",
-    user: req.user
-  });
+  res.json({ message: "Protected route accessed successfully ✅" });
 });
 
-app.listen("8080", () => {
-    console.log("app is listening at port 8080");
-})
+app.listen(8080, () => {
+  console.log("✅ app is listening at port 8080");
+});
